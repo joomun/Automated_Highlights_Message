@@ -4,6 +4,8 @@ from tkinter import filedialog, Listbox, Scrollbar, MULTIPLE, END, Toplevel, But
 from tkinter import ttk
 from ttkthemes import ThemedStyle  # Import ThemedStyle from ttkthemes
 
+import tkinter.messagebox as messagebox
+
 class RowSelector:
     def __init__(self, root, df, selected_columns, file_path):
         self.df = df
@@ -47,6 +49,7 @@ def browse_files():
         excel_file_paths.set(file_paths)
         process_excel_files(file_paths)
 
+
 def process_excel_files(file_paths):
     for file_path in file_paths:
         # Read data from Excel file
@@ -62,18 +65,36 @@ def process_excel_files(file_paths):
         for col in available_columns:
             column_listbox.insert(tk.END, col)
 
-        def show_selected_columns():
-            selected_column_indices = column_listbox.curselection()
-            selected_columns = [column_listbox.get(index) for index in selected_column_indices]
+        if "Night Audit Report.xls" in file_path:
+            # Display preset columns in a message box
+            preset_columns = ["Particulars", "Nett Day", "Nett Year"]
+            preset_columns_message = "\n".join(preset_columns)
+            messagebox.showinfo("Preset Columns", f"These columns will be preset for Night Audit Report:\n\n{preset_columns_message}")
 
-            if selected_columns:
+            # Ask user if they want to proceed with preset columns
+            proceed = messagebox.askyesno("Preset Columns", "Do you want to proceed with preset columns?")
+
+            if proceed:
+                selected_columns = preset_columns
+                for i in range(column_listbox.size()):
+                    if column_listbox.get(i) in selected_columns:
+                        column_listbox.select_set(i)
+
                 row_selector = RowSelector(root, df, selected_columns, file_path)
                 row_selectors[file_path] = row_selector
 
-        # Button to trigger column selection
-        show_columns_button = ttk.Button(root, text="Select Columns", command=show_selected_columns)
-        show_columns_button.pack()
-        
+        else:
+            def show_selected_columns():
+                selected_column_indices = column_listbox.curselection()
+                selected_columns = [column_listbox.get(index) for index in selected_column_indices]
+
+                if selected_columns:
+                    row_selector = RowSelector(root, df, selected_columns, file_path)
+                    row_selectors[file_path] = row_selector
+
+            # Button to trigger column selection
+            show_columns_button = ttk.Button(root, text="Select Columns", command=show_selected_columns)
+            show_columns_button.pack()        
 # Create a Tkinter window
 root = tk.Tk()
 root.title("Excel Data Selector")
