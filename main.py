@@ -7,6 +7,8 @@ from ttkthemes import ThemedStyle  # Import ThemedStyle from ttkthemes
 import tkinter.messagebox as messagebox
 
 class RowSelector:
+    
+    
     def __init__(self, root, df, selected_columns, file_path):
         self.df = df
         self.selected_columns = selected_columns
@@ -61,16 +63,21 @@ def process_excel_files(file_paths):
         # Create a listbox for column selection
         column_listbox = Listbox(root, selectmode=MULTIPLE)
         column_listbox.pack()
+        
+
 
         for col in available_columns:
             column_listbox.insert(tk.END, col)
 
         if "Night Audit Report.xls" in file_path:
             # Display preset columns in a message box
-            preset_columns = ["Particulars", "Nett Day", "Nett Year"]
+            preset_columns = ["Particulars", "Nett Day", "Nett Year","Test"]
             preset_columns_message = "\n".join(preset_columns)
             messagebox.showinfo("Preset Columns", f"These columns will be preset for Night Audit Report:\n\n{preset_columns_message}")
-
+                    # Check if any of the preset columns are missing
+            missing_preset_columns = [col for col in preset_columns if col not in available_columns]
+            if missing_preset_columns:
+                messagebox.showwarning("Missing Columns", f"The following preset columns are missing in the Excel file:\n\n{', '.join(missing_preset_columns)}")
             # Ask user if they want to proceed with preset columns
             proceed = messagebox.askyesno("Preset Columns", "Do you want to proceed with preset columns?")
 
@@ -97,6 +104,9 @@ def process_excel_files(file_paths):
             show_columns_button.pack()        
 # Create a Tkinter window
 root = tk.Tk()
+
+root.tk.call("source","azure.tcl")
+root.tk.call("set_theme","dark")
 root.title("Excel Data Selector")
 
 # Set the window size based on screen size
@@ -106,9 +116,6 @@ window_width = int(screen_width * 0.7)  # Set to 70% of screen width
 window_height = int(screen_height * 0.7)  # Set to 70% of screen height
 root.geometry(f"{window_width}x{window_height}")
 
-# Apply a theme to the root window
-style = ThemedStyle(root)
-style.set_theme("yaru")  # Choose a theme (e.g., "plastik", "adapta", "arc", etc.)
 
 # Create a StringVar to store the Excel file paths
 excel_file_paths = tk.StringVar()
