@@ -74,11 +74,17 @@ def process_excel_files(file_paths):
             preset_columns = ["Particulars", "Nett Day", "Nett Year","Test"]
             preset_columns_message = "\n".join(preset_columns)
             messagebox.showinfo("Preset Columns", f"These columns will be preset for Night Audit Report:\n\n{preset_columns_message}")
-                    # Check if any of the preset columns are missing
+            
+            # Check if any of the preset columns are missing
             missing_preset_columns = [col for col in preset_columns if col not in available_columns]
+            
             if missing_preset_columns:
                 messagebox.showwarning("Missing Columns", f"The following preset columns are missing in the Excel file:\n\n{', '.join(missing_preset_columns)}")
-            # Ask user if they want to proceed with preset columns
+                
+                # Remove missing preset columns from available_columns list
+                preset_columns = [col for col in preset_columns if col not in missing_preset_columns]
+                
+            # Ask the user if they want to proceed with preset columns
             proceed = messagebox.askyesno("Preset Columns", "Do you want to proceed with preset columns?")
 
             if proceed:
