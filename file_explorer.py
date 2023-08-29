@@ -8,6 +8,8 @@ def browse_file():
         excel_file_path.set(file_path)
         update_display()
 
+from tabulate import tabulate
+
 def read_excel():
     path = excel_file_path.get()
     if path:
@@ -15,7 +17,8 @@ def read_excel():
             df = pd.read_excel(path)
             result_text.config(state=tk.NORMAL)
             result_text.delete("1.0", tk.END)
-            result_text.insert(tk.END, df.head().to_string(index=False))
+            table_str = tabulate(df, headers='keys', tablefmt='grid')
+            result_text.insert(tk.END, table_str)
             result_text.config(state=tk.DISABLED)
         except Exception as e:
             result_text.config(state=tk.NORMAL)
