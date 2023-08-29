@@ -1,6 +1,6 @@
 import pandas as pd
 import tkinter as tk
-from tkinter import filedialog
+from tkinter import filedialog, Listbox, Scrollbar, MULTIPLE, END
 
 def browse_file():
     file_path = filedialog.askopenfilename(filetypes=[("Excel files", "*.xlsx *.xls")])
@@ -12,29 +12,37 @@ def process_excel_data(file_path):
     # Read data from Excel file
     df = pd.read_excel(file_path)
 
-    # Display the first few rows of the DataFrame
-    print("First few rows:")
-    print(df.head())
+    # Display the list of available columns
+    available_columns = df.columns.tolist()
 
-    # Access a specific column
-    column_data = df['Column_Name']  # Replace 'Column_Name' with the actual column name
-    print("Specific column:")
-    print(column_data)
+    # Create a listbox for column selection
+    listbox = Listbox(root, selectmode=MULTIPLE)
+    listbox.pack()
 
-    # Access a specific cell
-    row_index = 0  # Replace with the desired row index
-    cell_value = df.at[row_index, 'Column_Name']  # Replace 'Column_Name' with the actual column name
-    print(f"Value at row {row_index}: {cell_value}")
+    for col in available_columns:
+        listbox.insert(tk.END, col)
 
-    # Filter rows based on a condition
-    filtered_df = df[df['Numeric_Column'] > 50]  # Replace 'Numeric_Column' with the actual column name
-    print("Filtered rows:")
-    print(filtered_df)
+    def show_selected_columns():
+        selected_indices = listbox.curselection()
+        selected_columns = [listbox.get(index) for index in selected_indices]
 
-    # Iterate through rows
-    print("Iterating through rows:")
-    for index, row in df.iterrows():
-        print(index, row['Column_Name'])  # Replace 'Column_Name' with the actual column name
+        if selected_columns:
+            selected_data = df[selected_columns]
+
+            # Clear previous text and display new data
+            result_text.delete(1.0, tk.END)
+            result_text.insert(tk.END, str(selected_data))
+
+            # Resize the result_text widget based on content
+            result_text.config(height=min(20, len(selected_data) + 2))
+
+    # Button to trigger displaying selected columns
+    show_columns_button = tk.Button(root, text="Show Selected Columns", command=show_selected_columns)
+    show_columns_button.pack()
+
+    # Create a Text widget to display the result
+    result_text = tk.Text(root, height=5, width=50)
+    result_text.pack()
 
 # Create a Tkinter window
 root = tk.Tk()
