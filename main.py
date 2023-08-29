@@ -2,7 +2,7 @@ import pandas as pd
 import tkinter as tk
 from tkinter import filedialog, Listbox, Scrollbar, MULTIPLE, END, Toplevel, Button
 from tkinter import ttk
-
+from ttkthemes import ThemedStyle  # Import ThemedStyle from ttkthemes
 
 class RowSelector:
     def __init__(self, root, df, selected_columns, file_path):
@@ -84,6 +84,10 @@ screen_height = root.winfo_screenheight()
 window_width = int(screen_width * 0.7)  # Set to 70% of screen width
 window_height = int(screen_height * 0.7)  # Set to 70% of screen height
 root.geometry(f"{window_width}x{window_height}")
+
+# Apply a theme to the root window
+style = ThemedStyle(root)
+style.set_theme("yaru")  # Choose a theme (e.g., "plastik", "adapta", "arc", etc.)
 
 # Create a StringVar to store the Excel file paths
 excel_file_paths = tk.StringVar()
