@@ -47,24 +47,24 @@ class RowSelector:
 
 preset_columns_NAR = ["Particulars", "Nett Day", "Nett Year"]  # Add other columns you want
 preset_rows_NAR_values = ["Room Revenue","Food - All Day FullBoard", "Room Revenue -  No Show","Food & Beverages","Food - All Day HalfBoard","Food - All Day FullBoard","Food - All Day (Menus)","Food Breakfast Package","Food Breakfast (Menus)","Food - Meeting Room","Beverage - Beer","Beverage - Hot Drinks","Beverage - House Wine","Beverage - Soft Drinks","Beverage - Spirit","Beverage - Water","Space Rent - Accelerator","Space Rent - Boardroom","Space Rent - Educator (M)","Space Rent - Incubator","Commission - Car Rental","Commission - Forex Exchge","Commission - Paid Out","Commission -Taxi Services","Commission - Transfer","ICT Service - Room","Laundry - Contracted","Laundry - Inhouse","Misc - Currency Gain/Loss","Misc - Others","Misc - Photocopy","Phone Calls Local","NET REVENUE","TOTAL REVENUE"]
-
+# Function to open the preset configuration window
 # Function to open the preset configuration window
 def open_preset_config():
     preset_config_window = Toplevel(root)
     preset_config_window.title("Preset Configuration")
-    preset_config_window.geometry("400x300")
-    
+    preset_config_window.geometry("400x400")
+
     # Create labels and entry fields for rows and columns
     ttk.Label(preset_config_window, text="Preset Rows (comma-separated):").pack(pady=10)
     rows_entry = ttk.Entry(preset_config_window)
     rows_entry.pack(pady=10)
     rows_entry.insert(0, ",".join(preset_rows_NAR_values))
-    
+
     ttk.Label(preset_config_window, text="Preset Columns (comma-separated):").pack(pady=10)
     columns_entry = ttk.Entry(preset_config_window)
     columns_entry.pack(pady=10)
     columns_entry.insert(0, ",".join(preset_columns_NAR))
-    
+
     # Function to update preset values
     def update_preset_values():
         global preset_rows_NAR_values, preset_columns_NAR
@@ -74,11 +74,41 @@ def open_preset_config():
         preset_columns_NAR = [item.strip() for item in preset_columns]
         messagebox.showinfo("Preset Configuration", "Preset values updated successfully.")
         preset_config_window.destroy()
-    
+
     # Button to update preset values
     update_button = ttk.Button(preset_config_window, text="Update Preset Values", command=update_preset_values)
     update_button.pack(pady=20)
 
+    # Display current preset options
+    ttk.Label(preset_config_window, text="Current Preset Rows:").pack(pady=10)
+    current_rows_label = ttk.Label(preset_config_window, text=", ".join(preset_rows_NAR_values))
+    current_rows_label.pack(pady=10)
+
+    ttk.Label(preset_config_window, text="Current Preset Columns:").pack(pady=10)
+    current_columns_label = ttk.Label(preset_config_window, text=", ".join(preset_columns_NAR))
+    current_columns_label.pack(pady=10)
+
+    # Function to add new preset row
+    def add_new_row():
+        new_row = simpledialog.askstring("Add New Row", "Enter a new row value:")
+        if new_row:
+            preset_rows_NAR_values.append(new_row.strip())
+            current_rows_label.config(text=", ".join(preset_rows_NAR_values))
+
+    # Button to add new preset row
+    add_row_button = ttk.Button(preset_config_window, text="Add New Row", command=add_new_row)
+    add_row_button.pack(pady=10)
+
+    # Function to add new preset column
+    def add_new_column():
+        new_column = simpledialog.askstring("Add New Column", "Enter a new column value:")
+        if new_column:
+            preset_columns_NAR.append(new_column.strip())
+            current_columns_label.config(text=", ".join(preset_columns_NAR))
+
+    # Button to add new preset column
+    add_column_button = ttk.Button(preset_config_window, text="Add New Column", command=add_new_column)
+    add_column_button.pack(pady=10)
 def browse_files():
     file_paths = filedialog.askopenfilenames(filetypes=[("Excel files", "*.xlsx *.xls")])
     if file_paths:
