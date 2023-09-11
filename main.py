@@ -6,19 +6,22 @@ from ttkthemes import ThemedStyle  # Import ThemedStyle from ttkthemes
 
 import tkinter.messagebox as messagebox
 
+
 class RowSelector:
-    
-    
-    def __init__(self, root, df, selected_columns, file_path):
+    def __init__(self, root, df, selected_columns, file_path, selected_rows_values=None):
         self.df = df
         self.selected_columns = selected_columns
         self.file_path = file_path
-
         self.row_window = Toplevel(root)
         self.row_window.title("Row Selector")
         self.row_window.geometry("400x300")  # Set the window size
 
-        self.create_row_listbox()
+        # If specific rows are provided, select them directly; otherwise, show the selection listbox
+        if selected_rows_values:
+            self.show_selected_data_by_values(selected_rows_values)
+        else:
+            self.create_row_listbox()
+
 
     def create_row_listbox(self):
         ttk.Label(self.row_window, text="Select Rows:", font=("Helvetica", 12)).pack(pady=10)
@@ -33,12 +36,13 @@ class RowSelector:
         confirm_button.pack(pady=10)
 
     def show_selected_data(self):
+        
         selected_row_indices = self.row_listbox.curselection()
         selected_rows = [int(item.split(" ")[-1][:-1]) for item in [self.row_listbox.get(index) for index in selected_row_indices]]
 
         if selected_rows:
             selected_data = self.df.iloc[selected_rows][self.selected_columns]
-
+            print(selected_data)
             ttk.Label(root, text=f"Selected Data from: {self.file_path}", font=("Helvetica", 12)).pack()
             result_text = tk.Text(root, height=5, width=50)
             result_text.pack()
@@ -51,6 +55,17 @@ def browse_files():
         excel_file_paths.set(file_paths)
         process_excel_files(file_paths)
 
+def configure_canvas(event):
+    canvas.configure(scrollregion=canvas.bbox("all"))
+    content_frame.update_idletasks()  # Update the content frame's size
+    
+    # Add a vertical scrollbar to the content frame
+    canvas_width = content_frame.winfo_reqwidth()
+    if canvas_width > window_width:
+        canvas.config(scrollregion=canvas.bbox("all"))
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+    else:
+        scrollbar.pack_forget()
 
 def process_excel_files(file_paths):
     for file_path in file_paths:
@@ -70,32 +85,20 @@ def process_excel_files(file_paths):
             column_listbox.insert(tk.END, col)
 
         if "Night Audit Report.xls" in file_path:
-            # Display preset columns in a message box
-            preset_columns = ["Particulars", "Nett Day", "Nett Year","Test"]
-            preset_columns_message = "\n".join(preset_columns)
-            messagebox.showinfo("Preset Columns", f"These columns will be preset for Night Audit Report:\n\n{preset_columns_message}")
-            
+            # Preset columns and rows for Night Audit Report
+            preset_columns = ["Particulars", "Nett Day", "Nett Year"]
+            preset_rows_values = ["Food Breakfast (Menus)"]
+
             # Check if any of the preset columns are missing
             missing_preset_columns = [col for col in preset_columns if col not in available_columns]
             
             if missing_preset_columns:
                 messagebox.showwarning("Missing Columns", f"The following preset columns are missing in the Excel file:\n\n{', '.join(missing_preset_columns)}")
+                return
                 
-                # Remove missing preset columns from available_columns list
-                preset_columns = [col for col in preset_columns if col not in missing_preset_columns]
-                
-            # Ask the user if they want to proceed with preset columns
-            proceed = messagebox.askyesno("Preset Columns", "Do you want to proceed with preset columns?")
-
-            if proceed:
-                selected_columns = preset_columns
-                for i in range(column_listbox.size()):
-                    if column_listbox.get(i) in selected_columns:
-                        column_listbox.select_set(i)
-
-                row_selector = RowSelector(root, df, selected_columns, file_path)
-                row_selectors[file_path] = row_selector
-
+            # Display preset data without user intervention
+            row_selector = RowSelector(root, df, preset_columns, file_path, preset_rows_values)
+            row_selectors[file_path] = row_selector
         else:
             def show_selected_columns():
                 selected_column_indices = column_listbox.curselection()
@@ -108,6 +111,8 @@ def process_excel_files(file_paths):
             # Button to trigger column selection
             show_columns_button = ttk.Button(root, text="Select Columns", command=show_selected_columns)
             show_columns_button.pack()        
+            
+            
 # Create a Tkinter window
 root = tk.Tk()
 
@@ -131,9 +136,8 @@ canvas = tk.Canvas(root)
 canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
 # Create a Scrollbar for the canvas
-scrollbar = tk.Scrollbar(root, command=canvas.yview)
+scrollbar = Scrollbar(root, command=canvas.yview)
 scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-canvas.configure(yscrollcommand=scrollbar.set)
 
 # Create a Frame inside the canvas to hold the content
 content_frame = tk.Frame(canvas)
@@ -145,6 +149,7 @@ browse_button.pack(pady=20)
 
 # Dictionary to store RowSelector instances
 row_selectors = {}
+
 
 # Configure the canvas scrolling
 def configure_canvas(event):
