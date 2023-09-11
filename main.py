@@ -43,21 +43,10 @@ class RowSelector:
             result_text.pack()
             result_text.insert(tk.END, str(selected_data))
             
-    def show_selected_data(self):
-        selected_row_indices = self.row_listbox.curselection()
-
-        # Extract the data from the DataFrame based on the selected rows
-        selected_data = self.df.iloc[list(selected_row_indices)][self.selected_columns]
-        print(selected_data)
-        ttk.Label(root, text=f"Selected Data from: {self.file_path}", font=("Helvetica", 12)).pack()
-        result_text = tk.Text(root, height=5, width=50)
-        result_text.pack()
-        result_text.insert(tk.END, str(selected_data))
-
 
 
 preset_columns_NAR = ["Particulars", "Nett Day", "Nett Year"]  # Add other columns you want
-preset_rows_NAR_values = ["Food - All Day FullBoard", "Room Revenue -  No Show"]  # Replace RowXValue with actual row values you want to pre-select
+preset_rows_NAR_values = ["Room Revenue","Food - All Day FullBoard", "Room Revenue -  No Show","Food & Beverages","Food - All Day HalfBoard","Food - All Day FullBoard","Food - All Day (Menus)","Food Breakfast Package","Food Breakfast (Menus)","Food - Meeting Room","Beverage - Beer","Beverage - Hot Drinks","Beverage - House Wine","Beverage - Soft Drinks","Beverage - Spirit","Beverage - Water","Space Rent - Accelerator","Space Rent - Boardroom","Space Rent - Educator (M)","Space Rent - Incubator","Commission - Car Rental","Commission - Forex Exchge","Commission - Paid Out","Commission -Taxi Services","Commission - Transfer","ICT Service - Room","Laundry - Contracted","Laundry - Inhouse","Misc - Currency Gain/Loss","Misc - Others","Misc - Photocopy","Phone Calls Local","NET REVENUE","TOTAL REVENUE"]
 
 def browse_files():
     file_paths = filedialog.askopenfilenames(filetypes=[("Excel files", "*.xlsx *.xls")])
@@ -149,8 +138,8 @@ root.title("Excel Data Selector")
 # Set the window size based on screen size
 screen_width = root.winfo_screenwidth()
 screen_height = root.winfo_screenheight()
-window_width = int(screen_width * 0.7)  # Set to 70% of screen width
-window_height = int(screen_height * 0.7)  # Set to 70% of screen height
+window_width = int(screen_width * 1)  # Set to 70% of screen width
+window_height = int(screen_height * 1)  # Set to 70% of screen height
 root.geometry(f"{window_width}x{window_height}")
 
 
