@@ -6,22 +6,20 @@ from ttkthemes import ThemedStyle  # Import ThemedStyle from ttkthemes
 
 import tkinter.messagebox as messagebox
 
-
 class RowSelector:
-    def __init__(self, root, df, selected_columns, file_path, selected_rows_values=None):
+    def __init__(self, root, df, selected_columns, file_path, preset_rows_values=None):
         self.df = df
         self.selected_columns = selected_columns
         self.file_path = file_path
+
         self.row_window = Toplevel(root)
         self.row_window.title("Row Selector")
         self.row_window.geometry("400x300")  # Set the window size
 
-        # If specific rows are provided, select them directly; otherwise, show the selection listbox
-        if selected_rows_values:
-            self.show_selected_data_by_values(selected_rows_values)
+        if preset_rows_values:
+            self.show_selected_data_by_values(preset_rows_values)
         else:
             self.create_row_listbox()
-
 
     def create_row_listbox(self):
         ttk.Label(self.row_window, text="Select Rows:", font=("Helvetica", 12)).pack(pady=10)
@@ -35,19 +33,31 @@ class RowSelector:
         confirm_button = ttk.Button(self.row_window, text="Confirm Selection", command=self.show_selected_data)
         confirm_button.pack(pady=10)
 
-    def show_selected_data(self):
-        
-        selected_row_indices = self.row_listbox.curselection()
-        selected_rows = [int(item.split(" ")[-1][:-1]) for item in [self.row_listbox.get(index) for index in selected_row_indices]]
-
-        if selected_rows:
+    def show_selected_data_by_values(self, row_values):
+            # This function selects data based on row values and displays them
+            selected_rows = self.df[self.df.iloc[:, 0].isin(row_values)].index.tolist()
             selected_data = self.df.iloc[selected_rows][self.selected_columns]
             print(selected_data)
             ttk.Label(root, text=f"Selected Data from: {self.file_path}", font=("Helvetica", 12)).pack()
             result_text = tk.Text(root, height=5, width=50)
             result_text.pack()
-
             result_text.insert(tk.END, str(selected_data))
+            
+    def show_selected_data(self):
+        selected_row_indices = self.row_listbox.curselection()
+
+        # Extract the data from the DataFrame based on the selected rows
+        selected_data = self.df.iloc[list(selected_row_indices)][self.selected_columns]
+        print(selected_data)
+        ttk.Label(root, text=f"Selected Data from: {self.file_path}", font=("Helvetica", 12)).pack()
+        result_text = tk.Text(root, height=5, width=50)
+        result_text.pack()
+        result_text.insert(tk.END, str(selected_data))
+
+
+
+preset_columns_NAR = ["Particulars", "Nett Day", "Nett Year"]  # Add other columns you want
+preset_rows_NAR_values = ["Food - All Day FullBoard", "Room Revenue -  No Show"]  # Replace RowXValue with actual row values you want to pre-select
 
 def browse_files():
     file_paths = filedialog.askopenfilenames(filetypes=[("Excel files", "*.xlsx *.xls")])
@@ -85,20 +95,36 @@ def process_excel_files(file_paths):
             column_listbox.insert(tk.END, col)
 
         if "Night Audit Report.xls" in file_path:
-            # Preset columns and rows for Night Audit Report
-            preset_columns = ["Particulars", "Nett Day", "Nett Year"]
-            preset_rows_values = ["Food Breakfast (Menus)"]
-
+            # Display preset columns in a message box
+            
+            preset_columns = preset_columns_NAR
+            preset_rows_values = preset_rows_NAR_values  # Use preset rows
+            preset_columns_message = ",".join(preset_columns)
+            preset_columns_message = ",".join(preset_rows_values)
+            messagebox.showinfo("Preset Columns", f"These columns will be preset for Night Audit Report:\n\n{preset_columns_message}")
+            
             # Check if any of the preset columns are missing
             missing_preset_columns = [col for col in preset_columns if col not in available_columns]
             
             if missing_preset_columns:
                 messagebox.showwarning("Missing Columns", f"The following preset columns are missing in the Excel file:\n\n{', '.join(missing_preset_columns)}")
-                return
                 
-            # Display preset data without user intervention
-            row_selector = RowSelector(root, df, preset_columns, file_path, preset_rows_values)
-            row_selectors[file_path] = row_selector
+                # Remove missing preset columns from available_columns list
+                preset_columns = [col for col in preset_columns if col not in missing_preset_columns]
+                
+            # Ask the user if they want to proceed with preset columns
+            proceed = messagebox.askyesno("Preset Columns", "Do you want to proceed with preset columns?")
+
+            if proceed:
+                selected_columns = preset_columns
+                for i in range(column_listbox.size()):
+                    if column_listbox.get(i) in selected_columns:
+                        column_listbox.select_set(i)
+
+                # When creating the RowSelector instance:
+                row_selector = RowSelector(root, df, selected_columns, file_path, preset_rows_values)
+                
+
         else:
             def show_selected_columns():
                 selected_column_indices = column_listbox.curselection()
