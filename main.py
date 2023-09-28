@@ -196,7 +196,7 @@ root.tk.call("source","azure.tcl")
 root.tk.call("set_theme","dark")
 root.title("Excel Data Selector")
 
-# Set the window size based on screen size
+# Set the window size based on screen sizegit 
 screen_width = root.winfo_screenwidth()
 screen_height = root.winfo_screenheight()
 window_width = int(screen_width * 1)  # Set to 70% of screen width
