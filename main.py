@@ -20,6 +20,16 @@ class RowSelector:
             self.show_selected_data_by_values(preset_rows_values)
         else:
             self.create_row_listbox()
+            
+    def show_selected_data(self):
+        selected_row_indices = self.row_listbox.curselection()
+        selected_rows = [self.df.index[i] for i in selected_row_indices]
+        selected_data = self.df.loc[selected_rows, self.selected_columns]
+        print(selected_data)
+        ttk.Label(self.row_window, text=f"Selected Data from: {self.file_path}", font=("Helvetica", 12)).pack()
+        result_text = tk.Text(self.row_window, height=5, width=50)
+        result_text.pack()
+        result_text.insert(tk.END, str(selected_data))
 
     def create_row_listbox(self):
         ttk.Label(self.row_window, text="Select Rows:", font=("Helvetica", 12)).pack(pady=10)
@@ -138,30 +148,39 @@ def process_excel_files(file_paths):
         # Create a listbox for column selection
         column_listbox = Listbox(root, selectmode=MULTIPLE)
         column_listbox.pack()
-        
-
 
         for col in available_columns:
             column_listbox.insert(tk.END, col)
 
+        def show_selected_columns():
+            selected_column_indices = column_listbox.curselection()
+            selected_columns = [column_listbox.get(index) for index in selected_column_indices]
+
+            if selected_columns:
+                row_selector = RowSelector(root, df, selected_columns, file_path)
+                row_selectors[file_path] = row_selector
+
+        # Button to trigger column selection
+        show_columns_button = ttk.Button(root, text="Select Columns", command=show_selected_columns)
+        show_columns_button.pack()
+
         if "Night Audit Report.xls" in file_path:
             # Display preset columns in a message box
-            
             preset_columns = preset_columns_NAR
             preset_rows_values = preset_rows_NAR_values  # Use preset rows
             preset_columns_message = ",".join(preset_columns)
             preset_columns_message = ",".join(preset_rows_values)
             messagebox.showinfo("Preset Columns", f"These columns will be preset for Night Audit Report:\n\n{preset_columns_message}")
-            
+
             # Check if any of the preset columns are missing
             missing_preset_columns = [col for col in preset_columns if col not in available_columns]
-            
+
             if missing_preset_columns:
                 messagebox.showwarning("Missing Columns", f"The following preset columns are missing in the Excel file:\n\n{', '.join(missing_preset_columns)}")
-                
+
                 # Remove missing preset columns from available_columns list
                 preset_columns = [col for col in preset_columns if col not in missing_preset_columns]
-                
+
             # Ask the user if they want to proceed with preset columns
             proceed = messagebox.askyesno("Preset Columns", "Do you want to proceed with preset columns?")
 
@@ -173,21 +192,7 @@ def process_excel_files(file_paths):
 
                 # When creating the RowSelector instance:
                 row_selector = RowSelector(root, df, selected_columns, file_path, preset_rows_values)
-                
-
-        else:
-            def show_selected_columns():
-                selected_column_indices = column_listbox.curselection()
-                selected_columns = [column_listbox.get(index) for index in selected_column_indices]
-
-                if selected_columns:
-                    row_selector = RowSelector(root, df, selected_columns, file_path)
-                    row_selectors[file_path] = row_selector
-
-            # Button to trigger column selection
-            show_columns_button = ttk.Button(root, text="Select Columns", command=show_selected_columns)
-            show_columns_button.pack()        
-            
+           
             
 # Create a Tkinter window
 root = tk.Tk()
