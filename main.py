@@ -5,6 +5,7 @@ from tkinter import ttk
 from ttkthemes import ThemedStyle  # Import ThemedStyle from ttkthemes
 
 import tkinter.messagebox as messagebox
+from tkinter import simpledialog
 
 class RowSelector:
     def __init__(self, root, df, selected_columns, file_path, preset_rows_values=None):
