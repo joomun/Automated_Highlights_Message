@@ -5,6 +5,7 @@ from tkinter import ttk
 from ttkthemes import ThemedStyle  # Import ThemedStyle from ttkthemes
 
 import tkinter.messagebox as messagebox
+from tkinter import simpledialog
 
 class RowSelector:
     def __init__(self, root, df, selected_columns, file_path, preset_rows_values=None):
@@ -25,7 +26,7 @@ class RowSelector:
         selected_row_indices = self.row_listbox.curselection()
         selected_rows = [self.df.index[i] for i in selected_row_indices]
         selected_data = self.df.loc[selected_rows, self.selected_columns]
-        print(selected_data)
+
         ttk.Label(self.row_window, text=f"Selected Data from: {self.file_path}", font=("Helvetica", 12)).pack()
         result_text = tk.Text(self.row_window, height=5, width=50)
         result_text.pack()
@@ -47,7 +48,7 @@ class RowSelector:
             # This function selects data based on row values and displays them
             selected_rows = self.df[self.df.iloc[:, 0].isin(row_values)].index.tolist()
             selected_data = self.df.iloc[selected_rows][self.selected_columns]
-            print(selected_data)
+
             ttk.Label(root, text=f"Selected Data from: {self.file_path}", font=("Helvetica", 12)).pack()
             result_text = tk.Text(root, height=5, width=50)
             result_text.pack()
@@ -137,6 +138,32 @@ def configure_canvas(event):
     else:
         scrollbar.pack_forget()
 
+def calculate_room_revenue(df, time_period):
+    # Extract values from the dataframe based on the time_period
+    if time_period == "Daily":
+        nett_column = "Nett Day"
+    elif time_period == "Monthly":
+        nett_column = "Nett Year"
+    else:
+        return None
+
+    # Get values for each row
+    room_revenue = df[df["Particulars"] == "Room Revenue"][nett_column].sum()
+    
+    # Ensure the allowance is always positive
+    room_revenue_allowance = abs(df[df["Particulars"] == "Room Revenue - Allowance"][nett_column].sum())
+    
+    # Check if "Room Revenue - No Show" exists in the DataFrame
+    if "Room Revenue -  No Show" in df["Particulars"].values:
+        room_revenue_no_show = df[df["Particulars"] == "Room Revenue -  No Show"][nett_column].sum()
+    else:
+        room_revenue_no_show = 0
+
+    # Calculate total room revenue based on the formula
+    total_room_revenue = room_revenue - room_revenue_allowance + room_revenue_no_show
+    return total_room_revenue
+
+
 def process_excel_files(file_paths):
     for file_path in file_paths:
         # Read data from Excel file
@@ -192,6 +219,15 @@ def process_excel_files(file_paths):
 
                 # When creating the RowSelector instance:
                 row_selector = RowSelector(root, df, selected_columns, file_path, preset_rows_values)
+                selected_data = row_selector.df.iloc[row_selector.df[row_selector.df.iloc[:, 0].isin(preset_rows_values)].index.tolist()][selected_columns]
+                
+                daily_revenue = calculate_room_revenue(selected_data, "Daily")
+                monthly_revenue = calculate_room_revenue(selected_data, "Monthly")
+
+                result_text = tk.Text(root, height=5, width=50)
+                result_text.pack()
+                result_text.insert(tk.END, f"\n\nDaily Room Revenue: {daily_revenue}")
+                result_text.insert(tk.END, f"\nMonthly Room Revenue: {monthly_revenue}")
            
             
 # Create a Tkinter window
