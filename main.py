@@ -2,7 +2,7 @@ import pandas as pd
 import tkinter as tk
 from tkinter import (filedialog, Listbox, Scrollbar, MULTIPLE, END, Toplevel,
                      ttk, messagebox, simpledialog)
-
+from PIL import Image, ImageTk
 from ttkthemes import ThemedStyle
 
 
@@ -61,11 +61,18 @@ class App:
         self.root.tk.call("source", "azure.tcl")
         self.root.tk.call("set_theme", "dark")
         self.root.title("Excel Data Selector")
+        
         screen_width = self.root.winfo_screenwidth()
         screen_height = self.root.winfo_screenheight()
+        
         window_width = int(screen_width * 1)
         window_height = int(screen_height * 1)
-        self.root.geometry(f"{window_width}x{window_height}")
+        
+        # Calculate the position to center the window
+        x = (screen_width - window_width) // 2
+        y = (screen_height - window_height) // 2
+        
+        self.root.geometry(f"{window_width}x{window_height}+{x}+{y}")
 
         self.canvas = tk.Canvas(self.root)
         self.canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
@@ -248,8 +255,46 @@ class App:
                     result_text.insert(tk.END, f"\n\nDaily Room Revenue: {daily_revenue}")
                     result_text.insert(tk.END, f"\nMonthly Room Revenue: {monthly_revenue}")
             
-            
+def show_splash_screen(root, duration):
+    """
+    Display a splash screen for the given duration (in milliseconds).
+    """
+    splash = tk.Toplevel(root)
+    splash.geometry("600x338")  # Adjust the size as needed
+    splash.title("Loading...")
+    splash.overrideredirect(True)  # Remove window decorations
+
+    # Load the image using PIL
+    image = Image.open(".\Assets\Excel Data Selector.jpg")
+
+    # Resize the image to fit the container
+    image = image.resize((600, 338))
+
+    photo = ImageTk.PhotoImage(image)
+    label = tk.Label(splash, image=photo)
+    label.image = photo
+    label.pack(fill=tk.BOTH, expand=True)  # Fill the container
+
+    # Center the splash screen
+    splash.update()  # Update splash window to get accurate width and height
+    screen_width = root.winfo_screenwidth()
+    screen_height = root.winfo_screenheight()
+    x = (screen_width - splash.winfo_width()) // 2
+    y = (screen_height - splash.winfo_height()) // 2
+    splash.geometry("+%d+%d" % (x, y))
+
+    # Destroy the splash screen after the duration
+    root.after(duration, splash.destroy)
+
+
+
+def start_main_app(root):
+    app = App(root)
+    root.deiconify()  # Show the main window
+          
 if __name__ == "__main__":
     root = tk.Tk()
-    app = App(root)
+    root.withdraw()  # Hide the main window
+    show_splash_screen(root, duration=3000)  
+    root.after(3000, start_main_app, root)  # Schedule the creation of the main application window
     root.mainloop()
