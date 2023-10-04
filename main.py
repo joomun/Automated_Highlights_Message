@@ -59,7 +59,7 @@ class App:
 
     def configure_ui(self):
         self.root.tk.call("source", "azure.tcl")
-        self.root.tk.call("set_theme", "dark")
+        self.root.tk.call("set_theme", "light")
         self.root.title("Excel Data Selector")
         
         screen_width = self.root.winfo_screenwidth()
