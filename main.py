@@ -4,7 +4,8 @@ from tkinter import (filedialog, Listbox, Scrollbar, MULTIPLE, END, Toplevel,
                      ttk, messagebox, simpledialog)
 from PIL import Image, ImageTk
 from ttkthemes import ThemedStyle
-
+from twilio.rest import Client
+import os
 
 class RowSelector:
     def __init__(self, root, df, selected_columns, file_path, preset_rows_values=None):
@@ -254,6 +255,10 @@ class App:
                     result_text.pack()
                     result_text.insert(tk.END, f"\n\nDaily Room Revenue: {daily_revenue}")
                     result_text.insert(tk.END, f"\nMonthly Room Revenue: {monthly_revenue}")
+                    send_message = messagebox.askyesno("Send WhatsApp Message", "Do you want to send a WhatsApp message with the revenue details?")
+                    if send_message:
+                        message_body = f"Daily Room Revenue: {daily_revenue}\nMonthly Room Revenue: {monthly_revenue}"
+                        send_whatsapp_message(message_body)
             
 def show_splash_screen(root, duration):
     """
@@ -286,6 +291,22 @@ def show_splash_screen(root, duration):
     # Destroy the splash screen after the duration
     root.after(duration, splash.destroy)
 
+def send_whatsapp_message(message_body):
+    account_sid = os.environ.get('TWILIO_ACCOUNT_SID')
+    auth_token = os.environ.get('TWILIO_AUTH_TOKEN')
+    print(account_sid,auth_token)
+    if not account_sid or not auth_token:
+        print("Error: Twilio credentials not found in environment variables.")
+        return
+    
+    client = Client(account_sid, auth_token)
+
+    message = client.messages.create(
+        body=message_body,
+        from_='whatsapp:+14155238886',
+        to='whatsapp:+23057568744'
+    )
+    print(message.sid)
 
 
 def start_main_app(root):
