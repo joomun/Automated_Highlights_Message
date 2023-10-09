@@ -53,9 +53,54 @@ class App:
         self.row_selectors = {}
         self.preset_columns_NAR = ["Particulars", "Nett Day", "Nett Year"]
         self.preset_rows_NAR_values = [
-            "Room Revenue", "Food - All Day FullBoard", "Room Revenue -  No Show","Room Revenue - Allowance",
-            # ... (other values)
-            "NET REVENUE", "TOTAL REVENUE"
+            "Room Revenue",
+            "Room Revenue - Allowance",
+            "Room Revenue - Cancel Fee",
+            "Room Revenue - No Show",
+            "Food & Beverages",
+            "Food - All Day HalfBoard",
+            "Food - All Day FullBoard",
+            "Food - All Day (Menus)",
+            "Food Breakfast Package",
+            "Food Breakfast (Menus)",
+            "Food - Meeting Room",
+            "Beverage - Beer",
+            "Beverage - Hot Drinks",
+            "Beverage - House Wine",
+            "Beverage - Soft Drinks",
+            "Beverage - Spirit",
+            "Beverage - Water",
+
+            "ICT Service - Accelerator",
+            "ICT Service - Boardroom",
+            "ICT Service - Educator(M)",
+            "ICT Service - Educator 1",
+            "ICT Service - Incubator",
+            "Space Rent - Accelerator",
+            "Space Rent - Boardroom",
+            "Space Rent - Educator (M)",
+            "Space Rent - Educator 1",
+            "Space Rent - Incubator",
+
+            "Commission - Forex Exchge",
+            "Commission - Paid Out",
+            "Commission -Taxi Services",
+            "Commission - Transfer",
+            "ICT Service - Room",
+            "Laundry - Contracted",
+            "Laundry - Inhouse",
+            "Misc - Currency Gain/Loss",
+            "Misc - Others",
+            "Misc - Photocopy",
+            "Phone Calls Local",
+            "Internet",
+
+            
+            "TOTAL REVENUE",
+            "TOTAL",
+            "NET REVENUE",
+            
+            
         ]
 
     def configure_ui(self):
