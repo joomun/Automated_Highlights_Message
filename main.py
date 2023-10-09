@@ -56,7 +56,7 @@ class App:
             "Room Revenue",
             "Room Revenue - Allowance",
             "Room Revenue - Cancel Fee",
-            "Room Revenue - No Show",
+            "Room Revenue -  No Show",
             "Food & Beverages",
             "Food - All Day HalfBoard",
             "Food - All Day FullBoard",
@@ -226,7 +226,7 @@ class App:
         # Check if "Room Revenue - No Show" exists in the DataFrame
         if "Room Revenue -  No Show" in df["Particulars"].values:
             room_revenue_no_show = df[df["Particulars"] == "Room Revenue -  No Show"][nett_column].sum()
-       
+            
         else:
             room_revenue_no_show = 0
 
